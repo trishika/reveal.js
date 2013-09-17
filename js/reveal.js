@@ -35,6 +35,15 @@ var Reveal = (function(){
 			// Display a presentation progress bar
 			progress: true,
 
+			// Display a info bar
+			infos: false,
+
+			// Author
+			author: '',
+
+			// Title
+			title: '',
+
 			// Push each slide change to the browser history
 			history: false,
 
@@ -342,6 +351,9 @@ var Reveal = (function(){
 		dom.progress = createSingletonNode( dom.wrapper, 'div', 'progress', '<span></span>' );
 		dom.progressbar = dom.progress.querySelector( 'span' );
 
+		// Info bar
+		dom.infos = createSingletonNode( dom.wrapper, 'div', 'infos', '<span class="author"></span><span class="title"></span>' );
+
 		// Arrow controls
 		createSingletonNode( dom.wrapper, 'aside', 'controls',
 			'<div class="navigate-left"></div>' +
@@ -494,6 +506,7 @@ var Reveal = (function(){
 
 		dom.controls.style.display = config.controls ? 'block' : 'none';
 		dom.progress.style.display = config.progress ? 'block' : 'none';
+		dom.infos.style.display    = config.infos    ? 'block' : 'none';
 
 		if( config.rtl ) {
 			dom.wrapper.classList.add( 'rtl' );
@@ -582,6 +595,10 @@ var Reveal = (function(){
 			dom.progress.addEventListener( 'click', onProgressClicked, false );
 		}
 
+		if ( config.infos && dom.infos ) {
+			dom.infos.addEventListener( 'click', onProgressClicked, false );
+		}
+
 		[ 'touchstart', 'click' ].forEach( function( eventName ) {
 			dom.controlsLeft.forEach( function( el ) { el.addEventListener( eventName, onNavigateLeftClicked, false ); } );
 			dom.controlsRight.forEach( function( el ) { el.addEventListener( eventName, onNavigateRightClicked, false ); } );
@@ -616,6 +633,10 @@ var Reveal = (function(){
 
 		if ( config.progress && dom.progress ) {
 			dom.progress.removeEventListener( 'click', onProgressClicked, false );
+		}
+
+		if ( config.infos && dom.infos ) {
+			dom.infos.removeEventListener( 'click', onProgressClicked, false );
 		}
 
 		[ 'touchstart', 'click' ].forEach( function( eventName ) {
@@ -1055,6 +1076,7 @@ var Reveal = (function(){
 			}
 
 			updateProgress();
+			updateInfos();
 
 		}
 
@@ -1532,6 +1554,7 @@ var Reveal = (function(){
 
 		updateControls();
 		updateProgress();
+		updateInfos();
 		updateBackground();
 
 		// Update the URL hash
@@ -1564,6 +1587,7 @@ var Reveal = (function(){
 
 		updateControls();
 		updateProgress();
+		updateInfos();
 		updateBackground();
 
 	}
@@ -1772,6 +1796,25 @@ var Reveal = (function(){
 
 		}
 
+	}
+
+	/**
+	 * Update the status bar with relevant information
+	 */
+	function updateInfos()
+	{
+		// Update info if enabled
+		if( config.infos && dom.infos && currentSlide ) {
+
+			var title = config.title;
+			if(currentSlide.hasAttribute("title") && currentSlide.getAttribute("title")!=''){
+				title += ((config.title!='') ? ' : ' : '') + currentSlide.getAttribute("title");
+			}
+
+			dom.infos.querySelectorAll( ".title" )[0].innerHTML = title;
+			dom.infos.querySelectorAll( ".author" )[0].innerHTML = config.author;
+
+		}
 	}
 
 	/**
